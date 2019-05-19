@@ -229,6 +229,10 @@ body,
     flex: 1;
 }
 
+.border-transparent {
+    border-color: transparent;
+}
+
 // Pages
 @import './Layout';
 @import './api/APIConsole';

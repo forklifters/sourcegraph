@@ -14,6 +14,7 @@ const discussionCommentFieldsFragment = gql`
             ...UserFields
         }
         html
+        contents
         inlineURL
         createdAt
         updatedAt

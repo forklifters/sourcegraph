@@ -26,6 +26,12 @@ interface Props extends ExtensionsControllerProps {
     forceURL?: boolean
     className?: string
     commentClassName?: string
+
+    /**
+     * Do not show the first comment in the thread. This is useful when the first comment is treated
+     * specially (e.g., as the description of a thread or check).
+     */
+    skipFirstComment?: boolean
 }
 
 interface State {
@@ -120,19 +126,21 @@ export class DiscussionsThread extends React.PureComponent<Props, State> {
                 )}
                 {thread && (
                     <div className="discussions-thread__comments">
-                        {thread.comments.nodes.map(node => (
-                            <DiscussionsComment
-                                key={node.id}
-                                {...this.props}
-                                threadID={thread.id}
-                                comment={node}
-                                onReport={this.onCommentReport}
-                                onClearReports={this.onCommentClearReports}
-                                onDelete={this.onCommentDelete}
-                                extensionsController={this.props.extensionsController}
-                                className={this.props.commentClassName}
-                            />
-                        ))}
+                        {(this.props.skipFirstComment ? thread.comments.nodes.slice(1) : thread.comments.nodes).map(
+                            node => (
+                                <DiscussionsComment
+                                    key={node.id}
+                                    {...this.props}
+                                    threadID={thread.id}
+                                    comment={node}
+                                    onReport={this.onCommentReport}
+                                    onClearReports={this.onCommentClearReports}
+                                    onDelete={this.onCommentDelete}
+                                    extensionsController={this.props.extensionsController}
+                                    className={this.props.commentClassName}
+                                />
+                            )
+                        )}
                         <DiscussionsInput
                             key="input"
                             submitLabel="Comment"

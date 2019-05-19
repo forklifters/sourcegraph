@@ -37,7 +37,7 @@ export const ThreadSourcesPage: React.FunctionComponent<Props> = ({
     }
 
     return (
-        <div className="thread-sources-page">
+        <div className="thread-sources-page container">
             <ThreadSourceItemsList
                 {...props}
                 thread={thread}

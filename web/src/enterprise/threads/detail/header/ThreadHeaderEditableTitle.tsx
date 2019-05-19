@@ -68,13 +68,11 @@ export const ThreadHeaderEditableTitle: React.FunctionComponent<Props> = ({
     )
 
     return state === 'viewing' ? (
-        <div className={`d-flex align-items-center ${className}`}>
-            <div className="d-flex align-items-center mr-2">
-                <h1 className="font-weight-normal mb-0 h4">
-                    {thread.title} <span className="text-muted font-weight-normal">#{thread.idWithoutKind}</span>
-                </h1>
-            </div>
-            <button type="button" className="btn btn-secondary btn-sm" onClick={onEditClick}>
+        <div className={`d-flex align-items-start justify-content-between ${className}`}>
+            <h1 className="font-weight-normal mb-0 h2 mr-2">
+                {thread.title} <span className="text-muted font-weight-normal">#{thread.idWithoutKind}</span>
+            </h1>
+            <button type="button" className="btn btn-secondary btn-sm mt-1" onClick={onEditClick}>
                 Edit
             </button>
         </div>

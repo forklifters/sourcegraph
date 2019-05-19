@@ -24,12 +24,12 @@ export const ThreadDiscussionPage: React.FunctionComponent<Props> = ({
     threadSettings,
     ...props
 }) => (
-    <div className="thread-discussion-page">
+    <div className="thread-discussion-page container">
         <DiscussionsThread
             {...props}
             threadIDWithoutKind={thread.idWithoutKind}
-            className="m-3"
             commentClassName="border border-top-0"
+            skipFirstComment={true}
         />
     </div>
 )

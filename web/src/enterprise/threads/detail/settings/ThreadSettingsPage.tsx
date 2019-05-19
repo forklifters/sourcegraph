@@ -19,10 +19,10 @@ interface Props extends ExtensionsControllerProps {
 }
 
 /**
- * The manage page for a single thread.
+ * The settings page for a single thread.
  */
-export const ThreadManagePage: React.FunctionComponent<Props> = ({ thread, ...props }) => (
-    <div className="thread-manage-page">
+export const ThreadSettingsPage: React.FunctionComponent<Props> = ({ thread, ...props }) => (
+    <div className="thread-settings-page container">
         <div className="card d-none">
             {' '}
             {/* TODO!(sqs): add back */}

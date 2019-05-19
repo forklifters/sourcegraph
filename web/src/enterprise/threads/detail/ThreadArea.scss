@@ -1,6 +1,7 @@
-@import './overview/ThreadAreaHeader';
+@import './overview/ThreadOverview';
 @import './sidebar/ThreadAreaSidebar';
 @import './sources/ThreadSourceItemsList';
+@import './ThreadAreaNavbar';
 
 .thread-area {
     &__sidebar {
@@ -8,9 +9,6 @@
             min-width: 12rem;
             max-width: 80%;
         }
-    }
-
-    &__sidebar {
         background-color: $color-bg-2;
     }
 }

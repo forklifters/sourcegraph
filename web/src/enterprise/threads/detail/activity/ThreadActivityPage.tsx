@@ -4,7 +4,7 @@ import * as GQL from '../../../../../../shared/src/graphql/schema'
 import { ErrorLike } from '../../../../../../shared/src/util/errors'
 import { ThreadCreatePullRequestsButton } from '../../form/ThreadCreatePullRequestsButton'
 import { ThreadSettings } from '../../settings'
-import { ThreadPullRequestTemplateEditForm } from '../manage/ThreadPullRequestTemplateEditForm'
+import { ThreadPullRequestTemplateEditForm } from '../settings/ThreadPullRequestTemplateEditForm'
 import { ThreadStatusItemsList } from './ThreadStatusItemsList'
 
 interface Props {
@@ -25,7 +25,7 @@ export const ThreadActivityPage: React.FunctionComponent<Props> = ({
     threadSettings,
     ...props
 }) => (
-    <div className="thread-activity-page">
+    <div className="thread-activity-page container">
         {!threadSettings.pullRequestTemplate && (
             <div className="border rounded p-3 mb-3">
                 <h2>Create pull request template</h2>

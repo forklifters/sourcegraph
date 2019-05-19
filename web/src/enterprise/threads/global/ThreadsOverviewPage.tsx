@@ -21,7 +21,7 @@ export const ThreadsOverviewPage: React.FunctionComponent<Props> = props => (
     <div className="threads-overview-page mt-3 container">
         <PageTitle title={upperFirst(props.type)} />
         <WithQueryParameter
-            defaultQuery={threadsQueryWithValues('', { is: [props.type, 'open'] })}
+            defaultQuery={threadsQueryWithValues('', { is: [props.type.toLowerCase(), 'open'] })}
             history={props.history}
             location={props.location}
         >

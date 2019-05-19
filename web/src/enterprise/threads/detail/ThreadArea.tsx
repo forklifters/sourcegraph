@@ -13,11 +13,11 @@ import { ThreadsAreaContext } from '../global/ThreadsArea'
 import { ThreadSettings } from '../settings'
 import { ThreadActivityPage } from './activity/ThreadActivityPage'
 import { ThreadDiscussionPage } from './discussion/ThreadDiscussionPage'
-import { ThreadManagePage } from './manage/ThreadManagePage'
-import { ThreadAreaHeader } from './overview/ThreadAreaHeader'
 import { ThreadOverview } from './overview/ThreadOverview'
+import { ThreadSettingsPage } from './settings/ThreadSettingsPage'
 import { ThreadAreaSidebar } from './sidebar/ThreadAreaSidebar'
 import { ThreadSourcesPage } from './sources/ThreadSourcesPage'
+import { ThreadAreaNavbar } from './ThreadAreaNavbar'
 
 const NotFoundPage = () => (
     <HeroPage icon={MapSearchIcon} title="404: Not Found" subtitle="Sorry, the requested  page was not found." />
@@ -57,7 +57,7 @@ export const ThreadArea: React.FunctionComponent<Props> = props => {
     } = {
         ...props,
         thread: threadOrError,
-        onThreadUpdate: thread => setThreadOrError(thread),
+        onThreadUpdate: setThreadOrError,
         threadSettings: parseJSON(threadOrError.settings),
         areaURL: props.match.url,
     }
@@ -74,6 +74,7 @@ export const ThreadArea: React.FunctionComponent<Props> = props => {
             <div className="flex-1 overflow-auto">
                 <ErrorBoundary location={props.location}>
                     <ThreadOverview {...context} location={props.location} history={props.history} />
+                    <ThreadAreaNavbar {...context} className="my-3 sticky-top" />
                 </ErrorBoundary>
                 <ErrorBoundary location={props.location}>
                     <Switch>
@@ -87,25 +88,25 @@ export const ThreadArea: React.FunctionComponent<Props> = props => {
                             )}
                         />
                         <Route
-                            path={`${props.match.url}/sources`}
+                            path={`${props.match.url}/review`}
                             key="hardcoded-key" // see https://github.com/ReactTraining/react-router/issues/4578#issuecomment-334489490
                             exact={true}
                             // tslint:disable-next-line:jsx-no-lambda
                             render={routeComponentProps => <ThreadSourcesPage {...routeComponentProps} {...context} />}
                         />
                         <Route
-                            path={`${props.match.url}/activity`}
+                            path={`${props.match.url}/actions`}
                             key="hardcoded-key" // see https://github.com/ReactTraining/react-router/issues/4578#issuecomment-334489490
                             exact={true}
                             // tslint:disable-next-line:jsx-no-lambda
                             render={routeComponentProps => <ThreadActivityPage {...routeComponentProps} {...context} />}
                         />
                         <Route
-                            path={`${props.match.url}/manage`}
+                            path={`${props.match.url}/settings`}
                             key="hardcoded-key" // see https://github.com/ReactTraining/react-router/issues/4578#issuecomment-334489490
                             exact={true}
                             // tslint:disable-next-line:jsx-no-lambda
-                            render={routeComponentProps => <ThreadManagePage {...routeComponentProps} {...context} />}
+                            render={routeComponentProps => <ThreadSettingsPage {...routeComponentProps} {...context} />}
                         />
                         <Route key="hardcoded-key" component={NotFoundPage} />
                     </Switch>
