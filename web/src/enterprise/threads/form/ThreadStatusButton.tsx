@@ -9,9 +9,11 @@ import { updateThread } from '../../../discussions/backend'
 import { threadNoun } from '../util'
 
 interface Props {
+    includeNounInLabel?: boolean
     thread: Pick<GQL.IDiscussionThread, 'id' | 'status' | 'type'>
     onThreadUpdate: (thread: GQL.IDiscussionThread) => void
     className?: string
+    buttonClassName?: string
     extensionsController: {
         services: {
             notifications: {
@@ -33,9 +35,11 @@ interface Props {
  * TODO!(sqs): add tests like for ThreadHeaderEditableTitle
  */
 export const ThreadStatusButton: React.FunctionComponent<Props> = ({
+    includeNounInLabel,
     thread,
     onThreadUpdate,
     className = '',
+    buttonClassName = 'btn-secondary',
     extensionsController,
 }) => {
     const isOpen = thread.status !== GQL.ThreadStatus.CLOSED
@@ -62,9 +66,9 @@ export const ThreadStatusButton: React.FunctionComponent<Props> = ({
     )
     const Icon = isOpen ? CheckIcon : BackupRestoreIcon
     return (
-        <button type="submit" disabled={isLoading} className={`btn btn-secondary ${className}`} onClick={onClick}>
+        <button type="submit" disabled={isLoading} className={`btn ${buttonClassName} ${className}`} onClick={onClick}>
             {isLoading ? <LoadingSpinner className="icon-inline" /> : <Icon className="icon-inline" />}{' '}
-            {isOpen ? 'Close' : 'Reopen'} {threadNoun(thread.type)}
+            {isOpen ? 'Close' : 'Reopen'} {includeNounInLabel && threadNoun(thread.type)}
         </button>
     )
 }

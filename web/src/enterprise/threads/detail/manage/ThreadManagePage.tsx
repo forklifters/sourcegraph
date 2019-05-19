@@ -41,10 +41,15 @@ export const ThreadManagePage: React.FunctionComponent<Props> = ({ thread, ...pr
             <h4 className="card-header">Actions</h4>
             <div className="card-body">
                 {thread.type === GQL.ThreadType.CHECK && (
-                    <CheckThreadActivationStatusButton {...props} thread={thread} className="mr-2" />
+                    <CheckThreadActivationStatusButton
+                        {...props}
+                        thread={thread}
+                        className="mr-2"
+                        includeNounInLabel={true}
+                    />
                 )}
-                <ThreadStatusButton {...props} thread={thread} className="mr-2" />
-                <ThreadDeleteButton {...props} thread={thread} className="mr-2" />
+                <ThreadStatusButton {...props} thread={thread} className="mr-2" includeNounInLabel={true} />
+                <ThreadDeleteButton {...props} thread={thread} className="mr-2" includeNounInLabel={true} />
             </div>
         </div>
     </div>

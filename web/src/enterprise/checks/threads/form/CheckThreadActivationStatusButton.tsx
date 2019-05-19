@@ -1,6 +1,6 @@
 import { LoadingSpinner } from '@sourcegraph/react-loading-spinner'
-import PowerPlugIcon from 'mdi-react/PowerPlugIcon'
-import PowerPlugOffIcon from 'mdi-react/PowerPlugOffIcon'
+import FlashIcon from 'mdi-react/FlashIcon'
+import PauseCircleIcon from 'mdi-react/PauseCircleIcon'
 import React, { useCallback, useState } from 'react'
 import { NotificationType } from '../../../../../../shared/src/api/client/services/notifications'
 import { ExtensionsControllerProps } from '../../../../../../shared/src/extensions/controller'
@@ -9,9 +9,11 @@ import { updateThread } from '../../../../discussions/backend'
 import { threadNoun } from '../../../threads/util'
 
 interface Props {
+    includeNounInLabel?: boolean
     thread: Pick<GQL.IDiscussionThread, 'id' | 'status' | 'type'>
     onThreadUpdate: (thread: GQL.IDiscussionThread) => void
     className?: string
+    buttonClassName?: string
     extensionsController: {
         services: {
             notifications: {
@@ -33,9 +35,11 @@ interface Props {
  * TODO!(sqs): add tests like for ThreadHeaderEditableTitle
  */
 export const CheckThreadActivationStatusButton: React.FunctionComponent<Props> = ({
+    includeNounInLabel,
     thread,
     onThreadUpdate,
     className = '',
+    buttonClassName = 'btn-secondary',
     extensionsController,
 }) => {
     const isActive = thread.status === GQL.ThreadStatus.OPEN_ACTIVE
@@ -60,11 +64,11 @@ export const CheckThreadActivationStatusButton: React.FunctionComponent<Props> =
         },
         [isActive, isLoading]
     )
-    const Icon = isActive ? PowerPlugOffIcon : PowerPlugIcon
+    const Icon = isActive ? PauseCircleIcon : FlashIcon
     return thread.status === GQL.ThreadStatus.CLOSED ? null : (
-        <button type="submit" disabled={isLoading} className={`btn btn-secondary ${className}`} onClick={onClick}>
+        <button type="submit" disabled={isLoading} className={`btn ${buttonClassName} ${className}`} onClick={onClick}>
             {isLoading ? <LoadingSpinner className="icon-inline" /> : <Icon className="icon-inline" />}{' '}
-            {isActive ? 'Deactivate' : 'Activate'} {threadNoun(thread.type)}
+            {isActive ? 'Deactivate' : 'Activate'} {includeNounInLabel && threadNoun(thread.type)}
         </button>
     )
 }

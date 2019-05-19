@@ -74,6 +74,7 @@ const discussionThreadFieldsFragment = gql`
         displayName
         username
         avatarURL
+        url
     }
 `
 
@@ -237,9 +238,15 @@ export function addCommentToThread(threadID: GQL.ID, contents: string): Observab
 /**
  * Updates an existing discussion thread.
  *
- * @return Observable that emits the updated discussion thread and its comments.
+ * @return Observable that emits the updated discussion thread and its comments, or `null` if it was deleted.
  */
-export async function updateThread(input: GQL.IDiscussionThreadUpdateInput): Promise<GQL.IDiscussionThread> {
+export async function updateThread(
+    input: GQL.IDiscussionThreadUpdateInput & { delete: boolean }
+): Promise<GQL.IDiscussionThread | null>
+export async function updateThread(
+    input: Pick<GQL.IDiscussionThreadUpdateInput, Exclude<keyof GQL.IDiscussionThreadUpdateInput, 'delete'>>
+): Promise<GQL.IDiscussionThread>
+export async function updateThread(input: GQL.IDiscussionThreadUpdateInput): Promise<GQL.IDiscussionThread | null> {
     return mutateGraphQL(
         gql`
             mutation UpdateThread($input: DiscussionThreadUpdateInput!) {
@@ -262,7 +269,7 @@ export async function updateThread(input: GQL.IDiscussionThreadUpdateInput): Pro
     )
         .pipe(
             map(({ data, errors }) => {
-                if (!data || !data.discussions || !data.discussions.updateThread) {
+                if (!data || !data.discussions || (errors && errors.length > 0)) {
                     throw createAggregateError(errors)
                 }
                 return data.discussions.updateThread

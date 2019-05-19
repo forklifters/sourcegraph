@@ -9,9 +9,12 @@ import { updateThread } from '../../../discussions/backend'
 import { threadNoun } from '../util'
 
 interface Props {
+    textLabel?: boolean
+    includeNounInLabel?: boolean
     thread: Pick<GQL.IDiscussionThread, 'id' | 'type'>
     history: H.History
     className?: string
+    buttonClassName?: string
     extensionsController: {
         services: {
             notifications: {
@@ -30,9 +33,12 @@ interface Props {
  * A button that permanently deletes a thread.
  */
 export const ThreadDeleteButton: React.FunctionComponent<Props> = ({
+    textLabel = true,
+    includeNounInLabel,
     thread: { id: threadID, type },
     history,
     className = '',
+    buttonClassName = 'btn-danger',
     extensionsController,
 }) => {
     const [isLoading, setIsLoading] = useState(false)
@@ -58,9 +64,15 @@ export const ThreadDeleteButton: React.FunctionComponent<Props> = ({
         [isLoading]
     )
     return (
-        <button type="submit" disabled={isLoading} className={`btn btn-danger ${className}`} onClick={onClick}>
-            {isLoading ? <LoadingSpinner className="icon-inline" /> : <DeleteIcon className="icon-inline" />} Delete{' '}
-            {threadNoun(type)}
+        <button
+            type="submit"
+            disabled={isLoading}
+            className={`btn ${buttonClassName} ${className}`}
+            onClick={onClick}
+            data-tooltip={textLabel ? '' : `Delete ${threadNoun(type)}`}
+        >
+            {isLoading ? <LoadingSpinner className="icon-inline" /> : <DeleteIcon className="icon-inline" />}{' '}
+            {textLabel && <>Delete {includeNounInLabel && threadNoun(type)}</>}
         </button>
     )
 }

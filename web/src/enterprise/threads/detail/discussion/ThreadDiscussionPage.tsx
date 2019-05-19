@@ -16,19 +16,15 @@ interface Props extends ExtensionsControllerProps {
 }
 
 /**
- * The overview page for a single thread.
- *
- * TODO(sqs): figure out how this interacts with changes - it seems the thread would find multiple
- * hits and you might want to group them arbitrarily into batches that you will address - that is a
- * "change".
+ * The discussion page fragment for a single thread.
  */
-export const ThreadOverviewPage: React.FunctionComponent<Props> = ({
+export const ThreadDiscussionPage: React.FunctionComponent<Props> = ({
     thread,
     onThreadUpdate,
     threadSettings,
     ...props
 }) => (
-    <div className="thread-overview-page">
+    <div className="thread-discussion-page">
         <DiscussionsThread
             {...props}
             threadIDWithoutKind={thread.idWithoutKind}
