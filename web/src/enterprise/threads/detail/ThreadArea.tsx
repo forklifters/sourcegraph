@@ -62,6 +62,11 @@ export const ThreadArea: React.FunctionComponent<Props> = props => {
         areaURL: props.match.url,
     }
 
+    const isCheck = threadOrError && !isErrorLike(threadOrError) && threadOrError.type === GQL.ThreadType.CHECK
+    const hasReview = isCheck
+    const hasActions = isCheck
+    const hasSettings = isCheck
+
     return (
         <div className="thread-area border-top flex-1 d-flex flex-row-reverse">
             <Resizable
@@ -74,7 +79,9 @@ export const ThreadArea: React.FunctionComponent<Props> = props => {
             <div className="flex-1 overflow-auto">
                 <ErrorBoundary location={props.location}>
                     <ThreadOverview {...context} location={props.location} history={props.history} />
-                    <ThreadAreaNavbar {...context} className="my-3 sticky-top" />
+                    {(hasReview || hasActions || hasSettings) && (
+                        <ThreadAreaNavbar {...context} className="my-3 sticky-top" />
+                    )}
                 </ErrorBoundary>
                 <ErrorBoundary location={props.location}>
                     <Switch>
@@ -87,27 +94,39 @@ export const ThreadArea: React.FunctionComponent<Props> = props => {
                                 <ThreadDiscussionPage {...routeComponentProps} {...context} />
                             )}
                         />
-                        <Route
-                            path={`${props.match.url}/review`}
-                            key="hardcoded-key" // see https://github.com/ReactTraining/react-router/issues/4578#issuecomment-334489490
-                            exact={true}
-                            // tslint:disable-next-line:jsx-no-lambda
-                            render={routeComponentProps => <ThreadSourcesPage {...routeComponentProps} {...context} />}
-                        />
-                        <Route
-                            path={`${props.match.url}/actions`}
-                            key="hardcoded-key" // see https://github.com/ReactTraining/react-router/issues/4578#issuecomment-334489490
-                            exact={true}
-                            // tslint:disable-next-line:jsx-no-lambda
-                            render={routeComponentProps => <ThreadActivityPage {...routeComponentProps} {...context} />}
-                        />
-                        <Route
-                            path={`${props.match.url}/settings`}
-                            key="hardcoded-key" // see https://github.com/ReactTraining/react-router/issues/4578#issuecomment-334489490
-                            exact={true}
-                            // tslint:disable-next-line:jsx-no-lambda
-                            render={routeComponentProps => <ThreadSettingsPage {...routeComponentProps} {...context} />}
-                        />
+                        {hasReview && (
+                            <Route
+                                path={`${props.match.url}/review`}
+                                key="hardcoded-key" // see https://github.com/ReactTraining/react-router/issues/4578#issuecomment-334489490
+                                exact={true}
+                                // tslint:disable-next-line:jsx-no-lambda
+                                render={routeComponentProps => (
+                                    <ThreadSourcesPage {...routeComponentProps} {...context} />
+                                )}
+                            />
+                        )}
+                        {hasActions && (
+                            <Route
+                                path={`${props.match.url}/actions`}
+                                key="hardcoded-key" // see https://github.com/ReactTraining/react-router/issues/4578#issuecomment-334489490
+                                exact={true}
+                                // tslint:disable-next-line:jsx-no-lambda
+                                render={routeComponentProps => (
+                                    <ThreadActivityPage {...routeComponentProps} {...context} />
+                                )}
+                            />
+                        )}
+                        {hasSettings && (
+                            <Route
+                                path={`${props.match.url}/settings`}
+                                key="hardcoded-key" // see https://github.com/ReactTraining/react-router/issues/4578#issuecomment-334489490
+                                exact={true}
+                                // tslint:disable-next-line:jsx-no-lambda
+                                render={routeComponentProps => (
+                                    <ThreadSettingsPage {...routeComponentProps} {...context} />
+                                )}
+                            />
+                        )}
                         <Route key="hardcoded-key" component={NotFoundPage} />
                     </Switch>
                 </ErrorBoundary>
