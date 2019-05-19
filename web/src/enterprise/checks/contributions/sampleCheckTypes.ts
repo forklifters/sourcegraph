@@ -1,4 +1,3 @@
-import AlphabeticalIcon from 'mdi-react/AlphabeticalIcon'
 import AppleFinderIcon from 'mdi-react/AppleFinderIcon'
 import DeleteSweepIcon from 'mdi-react/DeleteSweepIcon'
 import DockerIcon from 'mdi-react/DockerIcon'
@@ -7,15 +6,9 @@ import LanguagePythonIcon from 'mdi-react/LanguagePythonIcon'
 import LanguageTypescriptIcon from 'mdi-react/LanguageTypescriptIcon'
 import NpmIcon from 'mdi-react/NpmIcon'
 import ReactIcon from 'mdi-react/ReactIcon'
-import { CheckType } from '../components/CheckTypeItem'
+import { CheckTemplate } from '../../../../../shared/src/api/client/services/checkTemplates'
 
-export const CHECK_TYPES: CheckType[] = [
-    {
-        id: 'check.textFindReplace',
-        title: 'Text find/replace',
-        description: 'Find a string (and optionally replace it with another string)',
-        icon: AlphabeticalIcon,
-    },
+export const CHECK_TYPES: CheckTemplate[] = [
     {
         id: 'check.upgradeNpmDependency',
         title: 'Upgrade npm dependency',

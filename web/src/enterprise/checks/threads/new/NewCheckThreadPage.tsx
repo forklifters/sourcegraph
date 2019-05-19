@@ -1,25 +1,39 @@
 import H from 'history'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { CheckTemplate } from '../../../../../../shared/src/api/client/services/checkTemplates'
+import { ExtensionsControllerProps } from '../../../../../../shared/src/extensions/controller'
 import { PageTitle } from '../../../../components/PageTitle'
-import { CheckTypeItem } from '../../components/CheckTypeItem'
-import { CHECK_TYPES } from '../../contributions/sampleCheckTypes'
+import { CheckTemplateItem } from '../../components/CheckTemplateItem'
+import { CheckThreadTemplateSelectFormControl } from './CheckThreadTemplateSelectFormControl'
 import { NewCheckThreadForm } from './NewCheckThreadForm'
-import { CheckThreadTypeSelectFormControl } from './NewCheckThreadSelectTypePage'
 
-interface Props {
+interface Props extends ExtensionsControllerProps<'services'> {
     history: H.History
     location: H.Location
 }
 
-const urlForType = (typeId: string | null): H.LocationDescriptor => {
-    const params = typeId !== null ? new URLSearchParams({ type: typeId }) : ''
+const urlForCheckTemplate = (checkTemplateId: string | null): H.LocationDescriptor => {
+    const params = checkTemplateId !== null ? new URLSearchParams({ template: checkTemplateId }) : ''
     return `/checks/new?${params}`
 }
 
-export const NewCheckThreadPage: React.FunctionComponent<Props> = ({ history, location }) => {
-    const typeId = new URLSearchParams(location.search).get('type')
-    const type = CHECK_TYPES.find(({ id }) => id === typeId)
+/**
+ * A page for adding a new check based on one of the registered check templates.
+ */
+export const NewCheckThreadPage: React.FunctionComponent<Props> = ({ history, location, extensionsController }) => {
+    const checkTemplateId = new URLSearchParams(location.search).get('template')
+    const [checkTemplate, setCheckTemplate] = useState<CheckTemplate>()
+    useEffect(() => {
+        if (checkTemplateId === null) {
+            setCheckTemplate(undefined)
+            return undefined
+        }
+        const subscription = extensionsController.services.checkTemplates
+            .getCheckTemplate(checkTemplateId)
+            .subscribe(checkTemplate => setCheckTemplate(checkTemplate || undefined))
+        return () => subscription.unsubscribe()
+    }, [checkTemplateId])
 
     return (
         <div className="new-check-thread-page container mt-4">
@@ -28,24 +42,27 @@ export const NewCheckThreadPage: React.FunctionComponent<Props> = ({ history, lo
             <div className="row">
                 <div className="col-md-9 col-lg-8 col-xl-7">
                     <label>Type</label>
-                    {!type ? (
-                        <CheckThreadTypeSelectFormControl urlForType={urlForType} />
+                    {!checkTemplate ? (
+                        <CheckThreadTemplateSelectFormControl
+                            urlForCheckTemplate={urlForCheckTemplate}
+                            extensionsController={extensionsController}
+                        />
                     ) : (
                         <>
-                            <CheckTypeItem
-                                checkType={type}
+                            <CheckTemplateItem
+                                checkTemplate={checkTemplate}
                                 className="border rounded"
                                 endFragment={
                                     <Link
-                                        to={urlForType(null)}
+                                        to={urlForCheckTemplate(null)}
                                         className="btn btn-secondary text-decoration-none"
-                                        data-tooltip="Choose a different type"
+                                        data-tooltip="Choose a different template"
                                     >
                                         Change
                                     </Link>
                                 }
                             />
-                            <NewCheckThreadForm checkType={type} className="mt-3" history={history} />
+                            <NewCheckThreadForm checkTemplate={checkTemplate} className="mt-3" history={history} />
                         </>
                     )}
                 </div>

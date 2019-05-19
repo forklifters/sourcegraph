@@ -1,19 +1,12 @@
-import React, { CSSProperties } from 'react'
-
-export interface CheckType {
-    id: string
-    title: string
-    description?: string
-    icon?: React.ComponentType<{ className?: string; style?: CSSProperties }>
-    iconColor?: string
-}
+import React from 'react'
+import { CheckTemplate } from '../../../../../shared/src/api/client/services/checkTemplates'
 
 interface Props {
     /** The HTML root element to use. */
     element?: 'div' | 'li'
 
     /** The data. */
-    checkType: CheckType
+    checkTemplate: CheckTemplate
 
     /** A fragment to render at the end. */
     endFragment?: React.ReactFragment
@@ -22,11 +15,11 @@ interface Props {
 }
 
 /**
- * A check type, with its icon, title, description, etc.
+ * A check template, with its icon, title, description, etc.
  */
-export const CheckTypeItem: React.FunctionComponent<Props> = ({
+export const CheckTemplateItem: React.FunctionComponent<Props> = ({
     element: Element = 'div',
-    checkType: { title, description, icon: Icon, iconColor },
+    checkTemplate: { title, description, icon: Icon, iconColor },
     endFragment,
     className = '',
 }) => (

@@ -2,15 +2,15 @@ import { LoadingSpinner } from '@sourcegraph/react-loading-spinner'
 import H from 'history'
 import AddIcon from 'mdi-react/AddIcon'
 import React, { useCallback, useState } from 'react'
+import { CheckTemplate } from '../../../../../../shared/src/api/client/services/checkTemplates'
 import * as GQL from '../../../../../../shared/src/graphql/schema'
 import { asError, ErrorLike, isErrorLike } from '../../../../../../shared/src/util/errors'
 import { Form } from '../../../../components/Form'
 import { createThread } from '../../../../discussions/backend'
 import { ThreadTitleFormGroup } from '../../../threads/form/ThreadTitleFormGroup'
-import { CheckType } from '../../components/CheckTypeItem'
 
 interface Props {
-    checkType: CheckType
+    checkTemplate: CheckTemplate
     className?: string
     history: H.History
 }
@@ -20,8 +20,8 @@ const LOADING: 'loading' = 'loading'
 /**
  * A form to create a new check thread.
  */
-export const NewCheckThreadForm: React.FunctionComponent<Props> = ({ checkType, className = '', history }) => {
-    const [title, setTitle] = useState(checkType.title)
+export const NewCheckThreadForm: React.FunctionComponent<Props> = ({ checkTemplate, className = '', history }) => {
+    const [title, setTitle] = useState(checkTemplate.title)
     const onTitleChange = useCallback<React.ChangeEventHandler<HTMLInputElement>>(
         e => setTitle(e.currentTarget.value),
         [title]
@@ -45,7 +45,7 @@ export const NewCheckThreadForm: React.FunctionComponent<Props> = ({ checkType, 
                     title,
                     contents: '',
                     type: GQL.ThreadType.CHECK,
-                    settings: JSON.stringify({ types: [checkType.id] }, null, 2),
+                    settings: JSON.stringify(checkTemplate.settings || {}, null, 2),
                     status,
                 }).toPromise()
                 setCreationOrError(thread)

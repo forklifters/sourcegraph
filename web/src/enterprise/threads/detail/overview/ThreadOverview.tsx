@@ -7,7 +7,6 @@ import { Timestamp } from '../../../../components/time/Timestamp'
 import { PersonLink } from '../../../../user/PersonLink'
 import { CheckThreadActivationStatusButton } from '../../../checks/threads/form/CheckThreadActivationStatusButton'
 import { ThreadStatusBadge } from '../../components/threadStatus/ThreadStatusBadge'
-import { ThreadDeleteButton } from '../../form/ThreadDeleteButton'
 import { ThreadStatusButton } from '../../form/ThreadStatusButton'
 import { ThreadSettings } from '../../settings'
 import { ThreadHeaderEditableTitle } from '../header/ThreadHeaderEditableTitle'
@@ -59,13 +58,6 @@ export const ThreadOverview: React.FunctionComponent<Props> = ({
                 onThreadUpdate={onThreadUpdate}
                 className="ml-2"
                 buttonClassName="btn-outline-warning"
-            />
-            <ThreadDeleteButton
-                {...props}
-                thread={thread}
-                className="ml-2"
-                buttonClassName="btn-outline-danger"
-                textLabel={false}
             />
         </div>
         <hr className="my-0" />
