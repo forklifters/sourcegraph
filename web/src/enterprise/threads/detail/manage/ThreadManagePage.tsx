@@ -3,6 +3,7 @@ import React from 'react'
 import { ExtensionsControllerProps } from '../../../../../../shared/src/extensions/controller'
 import * as GQL from '../../../../../../shared/src/graphql/schema'
 import { ErrorLike } from '../../../../../../shared/src/util/errors'
+import { CheckThreadActivationStatusButton } from '../../../checks/threads/form/CheckThreadActivationStatusButton'
 import { ThreadDeleteButton } from '../../form/ThreadDeleteButton'
 import { ThreadStatusButton } from '../../form/ThreadStatusButton'
 import { ThreadSettings } from '../../settings'
@@ -22,7 +23,9 @@ interface Props extends ExtensionsControllerProps {
  */
 export const ThreadManagePage: React.FunctionComponent<Props> = ({ thread, ...props }) => (
     <div className="thread-manage-page">
-        <div className="card d-block">
+        <div className="card d-none">
+            {' '}
+            {/* TODO!(sqs): add back */}
             <h4 className="card-header">Pull request template</h4>
             <div className="card-body">
                 <ThreadPullRequestTemplateEditForm {...props} thread={thread} />
@@ -37,6 +40,9 @@ export const ThreadManagePage: React.FunctionComponent<Props> = ({ thread, ...pr
         <div className="card my-5 d-inline-block">
             <h4 className="card-header">Actions</h4>
             <div className="card-body">
+                {thread.type === GQL.ThreadType.CHECK && (
+                    <CheckThreadActivationStatusButton {...props} thread={thread} className="mr-2" />
+                )}
                 <ThreadStatusButton {...props} thread={thread} className="mr-2" />
                 <ThreadDeleteButton {...props} thread={thread} className="mr-2" />
             </div>

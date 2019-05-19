@@ -87,7 +87,7 @@ export const ThreadsList: React.FunctionComponent<Props> = ({
                             {rightHeaderFragment && <div>{rightHeaderFragment}</div>}
                         </div>
                         {threadsOrError === LOADING ? (
-                            <LoadingSpinner className="mt-2" />
+                            <LoadingSpinner className="m-3" />
                         ) : threadsOrError.nodes.length === 0 ? (
                             <p className="p-2 mb-0 text-muted">No {nounForThreadKind(kind, true)} found.</p>
                         ) : (

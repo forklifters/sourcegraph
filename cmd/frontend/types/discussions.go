@@ -13,6 +13,8 @@ type DiscussionThread struct {
 	AuthorUserID int32
 	Title        string
 	Settings     *string
+	IsCheck      bool
+	IsActive     bool
 	CreatedAt    time.Time
 	ArchivedAt   *time.Time
 	UpdatedAt    time.Time

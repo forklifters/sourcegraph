@@ -79,12 +79,16 @@ func (t *discussionThreads) Create(ctx context.Context, newThread *types.Discuss
 		author_user_id,
 		title,
 		settings,
+		is_check,
+		is_active,
 		created_at,
 		updated_at
 	) VALUES ($1, $2, $3, $4, $5) RETURNING id`,
 		newThread.AuthorUserID,
 		newThread.Title,
 		newThread.Settings,
+		newThread.IsCheck,
+		newThread.IsActive,
 		newThread.CreatedAt,
 		newThread.UpdatedAt,
 	).Scan(&newThread.ID)
@@ -113,6 +117,9 @@ type DiscussionThreadsUpdateOptions struct {
 
 	// Settings, when non-nil, updates the thread's settings.
 	Settings *string
+
+	// Active, when non-nil, specifies whether the check is active or not.
+	Active *bool
 
 	// Archive, when non-nil, specifies whether the thread is archived or not.
 	Archive *bool
@@ -143,6 +150,12 @@ func (t *discussionThreads) Update(ctx context.Context, threadID int64, opts *Di
 	if opts.Settings != nil {
 		anyUpdate = true
 		if _, err := dbconn.Global.ExecContext(ctx, "UPDATE discussion_threads SET settings=$1 WHERE id=$2 AND deleted_at IS NULL", opts.Settings, threadID); err != nil {
+			return nil, err
+		}
+	}
+	if opts.Active != nil {
+		anyUpdate = true
+		if _, err := dbconn.Global.ExecContext(ctx, "UPDATE discussion_threads SET is_active=$1 WHERE id=$2 AND deleted_at IS NULL", *opts.Active, threadID); err != nil {
 			return nil, err
 		}
 	}
@@ -191,9 +204,17 @@ type DiscussionThreadsListOptions struct {
 	// LimitOffset specifies SQL LIMIT and OFFSET counts. It may be nil (no limit / offset).
 	*LimitOffset
 
-	// OpenStatus, when non-nil, specifies that only threads that are open (true) or closed (false)
+	// IsOpen, when non-nil, specifies that only threads that are open (true) or closed (false)
 	// should be returned.
-	OpenStatus *bool
+	IsOpen *bool
+
+	// IsActive, when non-nil, specifies that only threads that are active (true) or inactive
+	// (false) should be returned.
+	IsActive *bool
+
+	// IsCheck, when non-nil, specifies that only threads that are or aren't a check should be
+	// returned.
+	IsCheck *bool
 
 	// TitleQuery, when non-nil, specifies that only threads whose title
 	// matches this string should be returned.
@@ -296,10 +317,25 @@ func (opts *DiscussionThreadsListOptions) SetFromQuery(ctx context.Context, quer
 			switch value {
 			case "open":
 				v := true
-				opts.OpenStatus = &v
+				opts.IsOpen = &v
+			case "active":
+				v := true
+				opts.IsOpen = &v
+				opts.IsActive = &v
+			case "inactive":
+				t := true
+				f := false
+				opts.IsOpen = &t
+				opts.IsActive = &f
 			case "closed":
 				v := false
-				opts.OpenStatus = &v
+				opts.IsOpen = &v
+			case "check":
+				v := true
+				opts.IsCheck = &v
+			case "thread":
+				v := false
+				opts.IsCheck = &v
 			}
 		},
 
@@ -512,9 +548,15 @@ func (t *discussionThreads) fuzzyFilterThreads(opts *DiscussionThreadsListOption
 func (*discussionThreads) getListSQL(opts *DiscussionThreadsListOptions) (conds []*sqlf.Query) {
 	conds = []*sqlf.Query{sqlf.Sprintf("TRUE")}
 	conds = append(conds, sqlf.Sprintf("deleted_at IS NULL"))
-	if opts.OpenStatus != nil {
+	if opts.IsOpen != nil {
 		// TODO!(sqs): rename archived_at to closed_at?
-		conds = append(conds, sqlf.Sprintf("(archived_at IS NULL) = %v", *opts.OpenStatus))
+		conds = append(conds, sqlf.Sprintf("(archived_at IS NULL) = %v", *opts.IsOpen))
+	}
+	if opts.IsActive != nil {
+		conds = append(conds, sqlf.Sprintf("is_active = %v", *opts.IsActive))
+	}
+	if opts.IsCheck != nil {
+		conds = append(conds, sqlf.Sprintf("is_check = %v", *opts.IsCheck))
 	}
 	if opts.TitleQuery != nil && strings.TrimSpace(*opts.TitleQuery) != "" {
 		conds = append(conds, sqlf.Sprintf("title ILIKE %v", extraFuzzy(*opts.TitleQuery)))
@@ -590,6 +632,8 @@ func (t *discussionThreads) getBySQL(ctx context.Context, query string, args ...
 			t.author_user_id,
 			t.title,
 			t.settings,
+			t.is_check,
+			t.is_active,
 			t.created_at,
 			t.archived_at,
 			t.updated_at
@@ -607,6 +651,8 @@ func (t *discussionThreads) getBySQL(ctx context.Context, query string, args ...
 			&thread.AuthorUserID,
 			&thread.Title,
 			&thread.Settings,
+			&thread.IsCheck,
+			&thread.IsActive,
 			&thread.CreatedAt,
 			&thread.ArchivedAt,
 			&thread.UpdatedAt,

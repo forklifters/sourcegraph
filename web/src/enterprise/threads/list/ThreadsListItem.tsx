@@ -26,7 +26,7 @@ export const ThreadsListItem: React.FunctionComponent<Props> = ({ thread, itemCh
                     <input className="form-check-input position-static" type="checkbox" aria-label="Select item" />
                 </div>
             )}
-            <ThreadStatusIcon thread={thread} className={`small mr-2 mt-1`} />
+            <ThreadStatusIcon thread={thread} className="small mr-2 mt-1" />
             <div className="flex-1">
                 <h3 className="d-flex align-items-center mb-0">
                     <Link to={thread.url} className="text-body">

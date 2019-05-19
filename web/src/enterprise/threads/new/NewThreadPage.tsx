@@ -36,7 +36,7 @@ export const NewThreadPage: React.FunctionComponent<Props> = ({ kind, history })
             e.preventDefault()
             setCreationOrError(LOADING)
             try {
-                const thread = await createThread({ title, kind, contents: '' }).toPromise()
+                const thread = await createThread({ title, contents: '', type: GQL.ThreadType.THREAD }).toPromise()
                 setCreationOrError(thread)
                 history.push(thread.url)
             } catch (err) {

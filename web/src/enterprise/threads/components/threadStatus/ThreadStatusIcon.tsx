@@ -1,8 +1,8 @@
 import React from 'react'
-import { DiscussionThreadWithStatus, threadStatusInfo } from './threadStatus'
+import { ThreadStatusFields, threadStatusInfo } from './threadStatus'
 
 interface Props {
-    thread: DiscussionThreadWithStatus
+    thread: ThreadStatusFields
     className?: string
 }
 

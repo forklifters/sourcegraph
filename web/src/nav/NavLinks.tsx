@@ -82,30 +82,31 @@ export class NavLinks extends React.PureComponent<Props> {
                     <>
                         <li className="nav-item">
                             <LinkWithIconOnlyTooltip
-                                to="/notifications"
-                                text="Notifications"
-                                icon={BellIcon}
-                                className="nav-link btn btn-link px-3 text-decoration-none"
-                            />
-                        </li>
-                        <li className="nav-item">
-                            <LinkWithIconOnlyTooltip
                                 to="/checks"
                                 text="Checks"
                                 tooltip="Checks (alerts & automation)"
                                 icon={ChecksIcon}
-                                className="nav-link btn btn-link px-3 text-decoration-none"
+                                className="nav-link btn btn-link px-2 text-decoration-none"
                             />
                         </li>
                         <li className="nav-item mr-1">
-                            <ThreadsNavItem className="px-3" />
+                            <ThreadsNavItem className="px-2" />
+                        </li>
+                        <li className="nav-item">
+                            <Link
+                                to="/notifications"
+                                data-tooltip="Notifications"
+                                className="nav-link btn btn-link px-2 text-decoration-none"
+                            >
+                                <BellIcon className="icon-inline" />
+                            </Link>
                         </li>
                         <li className="nav-item d-none">
                             <LinkWithIconOnlyTooltip
                                 to="/changes"
                                 text="Changes"
                                 icon={ChangesIcon}
-                                className="nav-link btn btn-link px-3 text-decoration-none"
+                                className="nav-link btn btn-link px-2 text-decoration-none"
                             />
                         </li>
                     </>

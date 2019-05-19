@@ -61,6 +61,7 @@ const discussionThreadFieldsFragment = gql`
             totalCount
         }
         settings
+        type
         status
         url
         inlineURL

@@ -408,6 +408,24 @@ input DiscussionThreadTargetRepoSelectionInput {
     linesAfter: [String!]
 }
 
+# The types of discussion threads.
+enum ThreadType {
+    # A normal discussion thread.
+    THREAD
+    # A check.
+    CHECK
+}
+
+# The statuses of discussion threads.
+enum ThreadStatus {
+    # Open (for threads) or active (for checks).
+    OPEN_ACTIVE
+    # Inactive (for checks only). In this state, checks do not perform any "write" operations.
+    INACTIVE
+    # Closed (for threads and checks).
+    CLOSED
+}
+
 # A discussion thread that is centered around:
 #
 # - A repository.
@@ -468,6 +486,16 @@ input DiscussionThreadCreateInput {
 
     # The settings for the thread.
     settings: String
+
+    # The type of thread to create.
+    type: ThreadType!
+
+    # The initial status of the thread upon creation.
+    #
+    # For threads (DiscussionThreadCreateInput#type == ThreadType.CHECK), the default status is
+    # ThreadStatus.OPEN_ACTIVE. For checks (DiscussionThreadCreateInput#type == ThreadType.CHECK),
+    # the default status is ThreadStatus.INACTIVE.
+    status: ThreadStatus
 }
 
 # Describes an update mutation to an existing thread.
@@ -483,6 +511,9 @@ input DiscussionThreadUpdateInput {
 
     # When non-null, indicates that the thread should be archived.
     archive: Boolean
+
+    # When non-null, indicates that the check should be activated (true) or deactivated (false).
+    active: Boolean
 
     # When non-null, indicates that the thread should be deleted. Only admins
     # can perform this action.
@@ -2567,14 +2598,6 @@ type DiscussionThreadTargetRepo {
 # when it would otherwise be null.
 union DiscussionThreadTarget = DiscussionThreadTargetRepo | EmptyResponse
 
-# The possible statuses of a discussion thread.
-enum DiscussionThreadStatus {
-    # The discussion thread is open.
-    OPEN
-    # The discussion thread is closed.
-    CLOSED
-}
-
 # A discussion thread around some target (e.g. a file in a repo).
 type DiscussionThread implements Node {
     # The discussion thread ID (globally unique).
@@ -2607,7 +2630,10 @@ type DiscussionThread implements Node {
     settings: String!
 
     # The status of this discussion thread.
-    status: DiscussionThreadStatus!
+    status: ThreadStatus!
+
+    # The type of this discussion thread.
+    type: ThreadType!
 
     # The URL where this thread can be viewed in isolation.
     url: String!

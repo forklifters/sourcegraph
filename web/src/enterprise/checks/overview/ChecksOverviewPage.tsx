@@ -5,6 +5,7 @@ import { PageTitle } from '../../../components/PageTitle'
 import { WithQueryParameter } from '../../threads/components/withQueryParameter/WithQueryParameter'
 import { threadsQueryWithValues } from '../../threads/url'
 import { ChecksAreaContext } from '../global/ChecksArea'
+import { ChecksIcon } from '../icons'
 import { CheckThreadsList } from '../threads/list/CheckThreadsList'
 
 interface Props extends ChecksAreaContext {
@@ -19,7 +20,9 @@ export const ChecksOverviewPage: React.FunctionComponent<Props> = props => (
     <div className="checks-overview-page mt-3 container">
         <PageTitle title="Checks" />
         <div className="d-flex align-items-center justify-content-between mb-3">
-            <h1 className="h3 mb-0">Checks</h1>
+            <h1 className="h3 mb-0 d-flex align-items-center">
+                <ChecksIcon className="icon-inline mr-1" /> Checks
+            </h1>
             <Link to="/checks/new" className="btn btn-success">
                 New check
             </Link>

@@ -1,11 +1,12 @@
 import { LoadingSpinner } from '@sourcegraph/react-loading-spinner'
-import BackupRestoreIcon from 'mdi-react/BackupRestoreIcon'
 import CheckIcon from 'mdi-react/CheckIcon'
+import PowerPlugIcon from 'mdi-react/PowerPlugIcon'
+import PowerPlugOffIcon from 'mdi-react/PowerPlugOffIcon'
 import React, { useCallback, useState } from 'react'
-import { NotificationType } from '../../../../../shared/src/api/client/services/notifications'
-import { ExtensionsControllerProps } from '../../../../../shared/src/extensions/controller'
-import * as GQL from '../../../../../shared/src/graphql/schema'
-import { updateThread } from '../../../discussions/backend'
+import { NotificationType } from '../../../../../../shared/src/api/client/services/notifications'
+import { ExtensionsControllerProps } from '../../../../../../shared/src/extensions/controller'
+import * as GQL from '../../../../../../shared/src/graphql/schema'
+import { updateThread } from '../../../../discussions/backend'
 
 interface Props {
     thread: Pick<GQL.IDiscussionThread, 'id' | 'status'>
@@ -26,42 +27,44 @@ interface Props {
 }
 
 /**
- * A button that changes the status of a thread.
+ * A button that activates or deactivates a check.
  *
  * TODO!(sqs): currently it only sets it archived ("closed")
  * TODO!(sqs): add tests like for ThreadHeaderEditableTitle
  */
-export const ThreadStatusButton: React.FunctionComponent<Props> = ({
+export const CheckThreadActivationStatusButton: React.FunctionComponent<Props> = ({
     thread,
     onThreadUpdate,
     className = '',
     extensionsController,
 }) => {
-    const isOpen = thread.status !== GQL.ThreadStatus.CLOSED
+    const isActive = thread.status === GQL.ThreadStatus.OPEN_ACTIVE
     const [isLoading, setIsLoading] = useState(false)
     const onClick = useCallback<React.FormEventHandler>(
         async e => {
             e.preventDefault()
             setIsLoading(true)
             try {
-                const updatedThread = await updateThread({ threadID: thread.id, archive: isOpen })
+                const updatedThread = await updateThread({ threadID: thread.id, active: !isActive })
                 onThreadUpdate(updatedThread)
             } catch (err) {
                 extensionsController.services.notifications.showMessages.next({
-                    message: `Error archiving thread: ${err.message}`,
+                    message: `Error ${
+                        thread.status === GQL.ThreadStatus.INACTIVE ? 'activating' : 'deactivating'
+                    } check: ${err.message}`,
                     type: NotificationType.Error,
                 })
             } finally {
                 setIsLoading(false)
             }
         },
-        [isOpen, isLoading]
+        [isActive, isLoading]
     )
-    const Icon = isOpen ? CheckIcon : BackupRestoreIcon
-    return (
+    const Icon = isActive ? PowerPlugOffIcon : PowerPlugIcon
+    return thread.status === GQL.ThreadStatus.CLOSED ? null : (
         <button type="submit" disabled={isLoading} className={`btn btn-secondary ${className}`} onClick={onClick}>
             {isLoading ? <LoadingSpinner className="icon-inline" /> : <Icon className="icon-inline" />}{' '}
-            {isOpen ? 'Close' : 'Reopen'} thread
+            {isActive ? 'Deactivate' : 'Activate'} check
         </button>
     )
 }

@@ -1,41 +1,42 @@
-import CommentTextMultipleIcon from 'mdi-react/CommentTextMultipleIcon'
-import FeatureSearchIcon from 'mdi-react/FeatureSearchIcon'
 import * as GQL from '../../../../../../shared/src/graphql/schema'
+import { ChecksIcon } from '../../../checks/icons'
+import { ThreadsIcon } from '../../icons'
 
 /**
- * The subset of {@link GQL.IDiscussionThread}'s that is needed for displaying the thread's status.
+ * The subset of {@link GQL.IDiscussionThread}'s that is needed for displaying the thread's status icons.
  */
-export interface DiscussionThreadWithStatus extends Pick<GQL.IDiscussionThread, 'status'> {
-    targets: GQL.IDiscussionThread['targets'] | { totalCount: number }
-}
+export interface ThreadStatusFields extends Pick<GQL.IDiscussionThread, 'status' | 'type'> {}
 
-type ThreadStatusColor = 'success' | 'danger'
+type ThreadStatusColor = 'success' | 'danger' | 'info'
 
-const STATUS_COLOR: Record<GQL.DiscussionThreadStatus, ThreadStatusColor> = {
-    OPEN: 'success',
+const STATUS_COLOR: Record<GQL.ThreadStatus, ThreadStatusColor> = {
+    OPEN_ACTIVE: 'success',
+    INACTIVE: 'info',
     CLOSED: 'danger',
 }
 
-const hasTargets = (thread: DiscussionThreadWithStatus): boolean => thread.targets.totalCount > 0
+const threadIcon = (thread: ThreadStatusFields): React.ComponentType<{ className?: string }> =>
+    thread.type === GQL.ThreadType.CHECK ? ChecksIcon : ThreadsIcon
 
-const threadIcon = (thread: DiscussionThreadWithStatus): React.ComponentType<{ className?: string }> =>
-    hasTargets(thread) ? FeatureSearchIcon : CommentTextMultipleIcon
-
-const STATUS_TEXT: Record<GQL.DiscussionThreadStatus, string> = {
-    OPEN: 'Open',
-    CLOSED: 'Closed',
+const statusText = (thread: ThreadStatusFields) => {
+    switch (thread.status) {
+        case GQL.ThreadStatus.OPEN_ACTIVE:
+            return thread.type === GQL.ThreadType.CHECK ? 'Active' : 'Open'
+        case GQL.ThreadStatus.INACTIVE:
+            return 'Inactive'
+        case GQL.ThreadStatus.CLOSED:
+            return 'Closed'
+    }
 }
 
-const threadTooltip = (thread: DiscussionThreadWithStatus): string => {
-    const kind = hasTargets(thread) ? ' (query active)' : ''
-    return `${STATUS_TEXT[thread.status]}${kind}`
-}
+const threadTooltip = (thread: ThreadStatusFields): string =>
+    `${statusText(thread)} ${thread.type === GQL.ThreadType.CHECK ? 'check' : 'thread'}`
 
 /**
  * Returns information about how to display the thread's status.
  */
 export const threadStatusInfo = (
-    thread: DiscussionThreadWithStatus
+    thread: ThreadStatusFields
 ): {
     color: ThreadStatusColor
     icon: React.ComponentType<{ className?: string }>
@@ -44,6 +45,6 @@ export const threadStatusInfo = (
 } => ({
     color: STATUS_COLOR[thread.status],
     icon: threadIcon(thread),
-    text: STATUS_TEXT[thread.status],
+    text: statusText(thread),
     tooltip: threadTooltip(thread),
 })

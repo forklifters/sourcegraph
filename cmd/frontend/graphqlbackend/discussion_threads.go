@@ -195,6 +195,8 @@ func (r *discussionsMutationResolver) CreateThread(ctx context.Context, args *st
 		Contents string
 		Target   *discussionThreadTargetInput
 		Settings *string
+		Type     threadType
+		Status   *threadStatus
 	}
 }) (*discussionThreadResolver, error) {
 	if args.Input.Title == nil {
@@ -229,11 +231,26 @@ func (r *discussionsMutationResolver) CreateThread(ctx context.Context, args *st
 		}
 	}
 
+	// Apply default status.
+	var status threadStatus
+	switch {
+	case args.Input.Status != nil:
+		status = *args.Input.Status
+	case args.Input.Type == threadTypeThread:
+		status = threadStatusOpenActive
+	case args.Input.Type == threadTypeCheck:
+		status = threadStatusInactive
+	default:
+		return nil, fmt.Errorf("unexpected thread type %q", args.Input.Type)
+	}
+
 	// Create the thread.
 	newThread := &types.DiscussionThread{
 		AuthorUserID: currentUser.user.ID,
 		Title:        *args.Input.Title,
 		Settings:     args.Input.Settings,
+		IsCheck:      args.Input.Type == threadTypeCheck,
+		IsActive:     status == threadStatusOpenActive,
 	}
 	thread, err := db.DiscussionThreads.Create(ctx, newThread)
 	if err != nil {
@@ -272,6 +289,7 @@ func (r *discussionsMutationResolver) UpdateThread(ctx context.Context, args *st
 		Title    *string
 		Settings *string
 		Archive  *bool
+		Active   *bool
 		Delete   *bool
 	}
 }) (*discussionThreadResolver, error) {
@@ -301,6 +319,7 @@ func (r *discussionsMutationResolver) UpdateThread(ctx context.Context, args *st
 		Title:    args.Input.Title,
 		Settings: args.Input.Settings,
 		Archive:  args.Input.Archive,
+		Active:   args.Input.Active,
 		Delete:   delete,
 	})
 	if err != nil {
@@ -725,11 +744,21 @@ func (d *discussionThreadResolver) Settings(ctx context.Context) string {
 	return "{}"
 }
 
-func (d *discussionThreadResolver) Status() string {
-	if d.t.ArchivedAt == nil {
-		return "OPEN"
+func (d *discussionThreadResolver) Status() threadStatus {
+	if d.t.ArchivedAt != nil {
+		return threadStatusClosed
 	}
-	return "CLOSED"
+	if d.t.IsCheck && !d.t.IsActive {
+		return threadStatusInactive
+	}
+	return threadStatusOpenActive
+}
+
+func (d *discussionThreadResolver) Type() threadType {
+	if d.t.IsCheck {
+		return threadTypeCheck
+	}
+	return threadTypeThread
 }
 
 func (d *discussionThreadResolver) URL(ctx context.Context) string {
