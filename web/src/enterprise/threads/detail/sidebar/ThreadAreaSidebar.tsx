@@ -75,7 +75,7 @@ export const ThreadAreaSidebar: React.FunctionComponent<Props> = ({
                     <SourcePullIcon className="icon-inline" /> Changes{' '}
                     {threadSettings.createPullRequests && <span className="badge badge-secondary">50%</span>}
                 </NavLink>
-                {threadSettings.createPullRequests ? (
+                {/*{threadSettings.createPullRequests ? (
                     <div className="d-flex align-items-center position-relative mb-3 border rounded">
                         <Link to={`${thread.url}/activity`} className="stretched-link" />
                         <ThreadStatusItemsProgressBar
@@ -90,7 +90,7 @@ export const ThreadAreaSidebar: React.FunctionComponent<Props> = ({
                             10 pull requests pending
                         </Link>
                     </div>
-                )}
+                )} TODO!(sqs) */}
             </li>
             <li className="nav-item">
                 <NavLink
