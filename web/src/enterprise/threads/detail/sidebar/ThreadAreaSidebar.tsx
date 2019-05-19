@@ -50,7 +50,8 @@ export const ThreadAreaSidebar: React.FunctionComponent<Props> = ({
                     <ViewListIcon className="icon-inline" /> Sources{' '}
                     <span className="badge badge-secondary">{thread.targets.totalCount}</span>
                 </NavLink>
-                <ul className="nav flex-column thread-area-sidebar__subnav">
+                <ul className="nav flex-column thread-area-sidebar__subnav d-none">
+                    {/*TODO!(sqs) */}
                     <li className="nav-item">
                         <NavLink
                             to={`${areaURL}/sources?q=1`}

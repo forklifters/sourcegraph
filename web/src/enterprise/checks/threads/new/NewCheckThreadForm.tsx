@@ -27,6 +27,12 @@ export const NewCheckThreadForm: React.FunctionComponent<Props> = ({ checkType, 
         [title]
     )
 
+    const [status, setStatus] = useState(GQL.ThreadStatus.INACTIVE)
+    const onStatusChange = useCallback<React.ChangeEventHandler<HTMLInputElement>>(
+        e => setStatus(e.currentTarget.value as GQL.ThreadStatus),
+        [status]
+    )
+
     const [creationOrError, setCreationOrError] = useState<null | typeof LOADING | GQL.IDiscussionThread | ErrorLike>(
         null
     )
@@ -38,9 +44,9 @@ export const NewCheckThreadForm: React.FunctionComponent<Props> = ({ checkType, 
                 const thread = await createThread({
                     title,
                     contents: '',
-                    type: GQL.ThreadType.THREAD,
+                    type: GQL.ThreadType.CHECK,
                     settings: JSON.stringify({ types: [checkType.id] }, null, 2),
-                    status: GQL.ThreadStatus.INACTIVE,
+                    status,
                 }).toPromise()
                 setCreationOrError(thread)
                 history.push(thread.url)
@@ -48,13 +54,59 @@ export const NewCheckThreadForm: React.FunctionComponent<Props> = ({ checkType, 
                 setCreationOrError(asError(err))
             }
         },
-        [title, creationOrError]
+        [title, status, creationOrError]
     )
 
     return (
         <Form className={`form ${className}`} onSubmit={onSubmit}>
             <ThreadTitleFormGroup value={title} onChange={onTitleChange} disabled={creationOrError === LOADING} />
-            <button type="submit" disabled={creationOrError === LOADING} className="btn btn-primary">
+            <div className="form-group row">
+                <legend className="col-sm-2 pt-0 col-form-label text-nowrap">Initial status</legend>
+                <div className="col-sm-10">
+                    <div className="form-check mb-2">
+                        <input
+                            className="form-check-input"
+                            type="radio"
+                            name="new-check-thread-form__status"
+                            id="new-check-thread-form__status-inactive"
+                            value={GQL.ThreadStatus.INACTIVE}
+                            checked={status === GQL.ThreadStatus.INACTIVE}
+                            onChange={onStatusChange}
+                        />
+                        <label className="form-check-label" htmlFor="new-check-thread-form__status-inactive">
+                            Inactive <span className="text-muted">(recommended)</span>
+                        </label>
+                        <small className="form-text text-muted">
+                            You can preview this check's behavior after creation before it performs actions or sends
+                            notifications.
+                        </small>
+                    </div>
+                    <div className="form-check">
+                        <input
+                            className="form-check-input"
+                            type="radio"
+                            name="new-check-thread-form__status"
+                            id="new-check-thread-form__status-active"
+                            value={GQL.ThreadStatus.OPEN_ACTIVE}
+                            checked={status === GQL.ThreadStatus.OPEN_ACTIVE}
+                            onChange={onStatusChange}
+                        />
+                        <label className="form-check-label" htmlFor="new-check-thread-form__status-active">
+                            Active
+                        </label>
+                        <small className="form-text text-muted">
+                            This check may immediately start performing actions and sending notifications.
+                        </small>
+                    </div>
+                </div>
+            </div>
+            {status === GQL.ThreadStatus.OPEN_ACTIVE && (
+                <div className="alert alert-warning">
+                    Active checks will immediately start performing actions and sending notifications. Select{' '}
+                    <strong>Inactive</strong> to preview or customize its behavior first.
+                </div>
+            )}
+            <button type="submit" disabled={creationOrError === LOADING} className="btn btn-primary mt-2">
                 {creationOrError === LOADING ? (
                     <LoadingSpinner className="icon-inline" />
                 ) : (
