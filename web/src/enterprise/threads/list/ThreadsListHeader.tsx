@@ -5,20 +5,19 @@ import TagOutlineIcon from 'mdi-react/TagOutlineIcon'
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { QueryParameterProps } from '../components/withQueryParameter/WithQueryParameter'
-import { nounForThreadKind, ThreadKind } from '../util'
+import { ThreadsAreaContext } from '../global/ThreadsArea'
+import { threadNoun } from '../util'
 import { ThreadsListFilter } from './ThreadsListFilter'
 import { ThreadsListButtonDropdownFilter } from './ThreadsListFilterButtonDropdown'
 
-interface Props extends QueryParameterProps {
-    kind: ThreadKind
-
+interface Props extends QueryParameterProps, Pick<ThreadsAreaContext, 'type'> {
     location: H.Location
 }
 
 /**
  * The header for the list of threads.
  */
-export const ThreadsListHeader: React.FunctionComponent<Props> = ({ kind, query, onQueryChange, location }) => (
+export const ThreadsListHeader: React.FunctionComponent<Props> = ({ type, query, onQueryChange, location }) => (
     <div className="d-flex justify-content-between align-items-start">
         <div className="flex-1 mr-5 d-flex">
             <div className="flex-1 mb-3 mr-2">
@@ -47,7 +46,7 @@ export const ThreadsListHeader: React.FunctionComponent<Props> = ({ kind, query,
             </Link>
             {/* tslint:disable-next-line: jsx-ban-props to avoid its width changing between checks/codemods */}
             <Link to={`${location.pathname}/-/new`} className="btn btn-success" style={{ minWidth: '118px' }}>
-                New {nounForThreadKind(kind)}
+                New {threadNoun(type)}
             </Link>
         </div>
     </div>

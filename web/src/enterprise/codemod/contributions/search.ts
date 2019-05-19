@@ -2,7 +2,6 @@ import H from 'history'
 import { Subscription, Unsubscribable } from 'rxjs'
 import { parseContributionExpressions } from '../../../../../shared/src/api/client/services/contribution'
 import { ContributableMenu } from '../../../../../shared/src/api/protocol'
-import { TabsWithURLViewStatePersistence } from '../../../../../shared/src/components/Tabs'
 import { ExtensionsControllerProps } from '../../../../../shared/src/extensions/controller'
 import * as GQL from '../../../../../shared/src/graphql/schema'
 import { createThread } from '../../../discussions/backend'
@@ -74,6 +73,7 @@ export function registerCodemodSearchContributions({
                         title,
                         settings: JSON.stringify({ query }),
                         contents: 'Created codemod',
+                        type: GQL.ThreadType.CHECK,
                     }).toPromise()
                     setTimeout(() => history.push(`${thread.url}/activity`), 500)
                 }

@@ -6,9 +6,10 @@ import { NotificationType } from '../../../../../shared/src/api/client/services/
 import { ExtensionsControllerProps } from '../../../../../shared/src/extensions/controller'
 import * as GQL from '../../../../../shared/src/graphql/schema'
 import { updateThread } from '../../../discussions/backend'
+import { threadNoun } from '../util'
 
 interface Props {
-    thread: Pick<GQL.IDiscussionThread, 'id'>
+    thread: Pick<GQL.IDiscussionThread, 'id' | 'type'>
     history: H.History
     className?: string
     extensionsController: {
@@ -29,7 +30,7 @@ interface Props {
  * A button that permanently deletes a thread.
  */
 export const ThreadDeleteButton: React.FunctionComponent<Props> = ({
-    thread: { id: threadID },
+    thread: { id: threadID, type },
     history,
     className = '',
     extensionsController,
@@ -58,8 +59,8 @@ export const ThreadDeleteButton: React.FunctionComponent<Props> = ({
     )
     return (
         <button type="submit" disabled={isLoading} className={`btn btn-danger ${className}`} onClick={onClick}>
-            {isLoading ? <LoadingSpinner className="icon-inline" /> : <DeleteIcon className="icon-inline" />} Delete
-            thread
+            {isLoading ? <LoadingSpinner className="icon-inline" /> : <DeleteIcon className="icon-inline" />} Delete{' '}
+            {threadNoun(type)}
         </button>
     )
 }

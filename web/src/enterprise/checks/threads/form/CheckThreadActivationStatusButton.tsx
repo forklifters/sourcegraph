@@ -1,5 +1,4 @@
 import { LoadingSpinner } from '@sourcegraph/react-loading-spinner'
-import CheckIcon from 'mdi-react/CheckIcon'
 import PowerPlugIcon from 'mdi-react/PowerPlugIcon'
 import PowerPlugOffIcon from 'mdi-react/PowerPlugOffIcon'
 import React, { useCallback, useState } from 'react'
@@ -7,9 +6,10 @@ import { NotificationType } from '../../../../../../shared/src/api/client/servic
 import { ExtensionsControllerProps } from '../../../../../../shared/src/extensions/controller'
 import * as GQL from '../../../../../../shared/src/graphql/schema'
 import { updateThread } from '../../../../discussions/backend'
+import { threadNoun } from '../../../threads/util'
 
 interface Props {
-    thread: Pick<GQL.IDiscussionThread, 'id' | 'status'>
+    thread: Pick<GQL.IDiscussionThread, 'id' | 'status' | 'type'>
     onThreadUpdate: (thread: GQL.IDiscussionThread) => void
     className?: string
     extensionsController: {
@@ -64,7 +64,7 @@ export const CheckThreadActivationStatusButton: React.FunctionComponent<Props> =
     return thread.status === GQL.ThreadStatus.CLOSED ? null : (
         <button type="submit" disabled={isLoading} className={`btn btn-secondary ${className}`} onClick={onClick}>
             {isLoading ? <LoadingSpinner className="icon-inline" /> : <Icon className="icon-inline" />}{' '}
-            {isActive ? 'Deactivate' : 'Activate'} check
+            {isActive ? 'Deactivate' : 'Activate'} {threadNoun(thread.type)}
         </button>
     )
 }

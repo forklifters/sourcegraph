@@ -10,7 +10,7 @@ import { PageTitle } from '../../../components/PageTitle'
 import { createThread } from '../../../discussions/backend'
 import { ThreadTitleFormGroup } from '../form/ThreadTitleFormGroup'
 import { ThreadsAreaContext } from '../global/ThreadsArea'
-import { nounForThreadKind } from '../util'
+import { threadNoun } from '../util'
 
 interface Props extends ThreadsAreaContext {
     history: H.History
@@ -21,7 +21,7 @@ const LOADING: 'loading' = 'loading'
 /**
  * Shows a form to create a new thread.
  */
-export const NewThreadPage: React.FunctionComponent<Props> = ({ kind, history }) => {
+export const NewThreadPage: React.FunctionComponent<Props> = ({ type, history }) => {
     const [title, setTitle] = useState('')
     const onTitleChange = useCallback<React.ChangeEventHandler<HTMLInputElement>>(
         e => setTitle(e.currentTarget.value),
@@ -50,7 +50,7 @@ export const NewThreadPage: React.FunctionComponent<Props> = ({ kind, history })
         <>
             <PageTitle title="New extension" />
             <ModalPage className="registry-new-extension-page">
-                <h2>New {nounForThreadKind(kind)}</h2>
+                <h2>New {threadNoun(type)}</h2>
                 <Form onSubmit={onSubmit}>
                     <ThreadTitleFormGroup
                         value={title}
@@ -63,7 +63,7 @@ export const NewThreadPage: React.FunctionComponent<Props> = ({ kind, history })
                         ) : (
                             <AddIcon className="icon-inline" />
                         )}{' '}
-                        Create {nounForThreadKind(kind)}
+                        Create {threadNoun(type)}
                     </button>
                 </Form>
                 {isErrorLike(creationOrError) && (

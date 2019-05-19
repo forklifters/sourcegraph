@@ -3,6 +3,7 @@ import { Subscription, Unsubscribable } from 'rxjs'
 import { parseContributionExpressions } from '../../../../../shared/src/api/client/services/contribution'
 import { ContributableMenu } from '../../../../../shared/src/api/protocol'
 import { ExtensionsControllerProps } from '../../../../../shared/src/extensions/controller'
+import * as GQL from '../../../../../shared/src/graphql/schema'
 import { createThread } from '../../../discussions/backend'
 import { parseSearchURLQuery } from '../../../search'
 
@@ -39,6 +40,7 @@ function registerSearchContextBarActions({
                         title,
                         settings: JSON.stringify({ query }),
                         contents: '',
+                        type: GQL.ThreadType.CHECK,
                     }).toPromise()
                     history.push(thread.url)
                 }

@@ -19,9 +19,9 @@ interface Props extends ThreadsAreaContext {
  */
 export const ThreadsOverviewPage: React.FunctionComponent<Props> = props => (
     <div className="threads-overview-page mt-3 container">
-        <PageTitle title={upperFirst(props.kind)} />
+        <PageTitle title={upperFirst(props.type)} />
         <WithQueryParameter
-            defaultQuery={threadsQueryWithValues('', { is: [props.kind, 'open'] })}
+            defaultQuery={threadsQueryWithValues('', { is: [props.type, 'open'] })}
             history={props.history}
             location={props.location}
         >

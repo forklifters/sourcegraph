@@ -1,5 +1,5 @@
-export type ThreadKind = 'thread' | 'check' | 'codemod'
+import * as GQL from '../../../../shared/src/graphql/schema'
 
-export function nounForThreadKind(kind: ThreadKind, plural = false): string {
+export function threadNoun(kind: GQL.ThreadType, plural = false): string {
     return `${kind.toLowerCase()}${plural ? 's' : ''}`
 }

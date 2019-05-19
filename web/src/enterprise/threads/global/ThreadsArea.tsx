@@ -2,11 +2,11 @@ import MapSearchIcon from 'mdi-react/MapSearchIcon'
 import React, { useEffect } from 'react'
 import { Route, RouteComponentProps, Switch } from 'react-router'
 import { ExtensionsControllerProps } from '../../../../../shared/src/extensions/controller'
+import * as GQL from '../../../../../shared/src/graphql/schema'
 import { HeroPage } from '../../../components/HeroPage'
 import { registerDiscussionsContributions } from '../../../repo/blob/discussions/contributions'
 import { ThreadArea } from '../detail/ThreadArea'
 import { NewThreadPage } from '../new/NewThreadPage'
-import { ThreadKind } from '../util'
 import { ThreadsManageArea } from './manage/ThreadsManageArea'
 import { ThreadsOverviewPage } from './ThreadsOverviewPage'
 
@@ -19,13 +19,13 @@ const NotFoundPage: React.FunctionComponent = () => (
  * and codemods).
  */
 export interface ThreadsAreaContext extends ExtensionsControllerProps {
-    kind: ThreadKind
+    type: GQL.ThreadType
     isLightTheme: boolean
 }
 
 export interface ThreadsAreaProps
-    extends Pick<ThreadsAreaContext, Exclude<keyof ThreadsAreaContext, 'kind'>>,
-        Partial<Pick<ThreadsAreaContext, 'kind'>>,
+    extends Pick<ThreadsAreaContext, Exclude<keyof ThreadsAreaContext, 'type'>>,
+        Partial<Pick<ThreadsAreaContext, 'type'>>,
         RouteComponentProps<{}>,
         ExtensionsControllerProps {}
 
@@ -40,7 +40,7 @@ export const ThreadsArea: React.FunctionComponent<ThreadsAreaProps> = ({ match, 
 
     const context: ThreadsAreaContext = {
         ...props,
-        kind: props.kind || 'thread',
+        type: props.type || GQL.ThreadType.THREAD,
     }
 
     return (

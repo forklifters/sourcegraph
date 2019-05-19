@@ -2,19 +2,21 @@ import H from 'history'
 import React from 'react'
 import { ListHeaderQueryLinksButtonGroup } from '../../../threads/components/ListHeaderQueryLinks'
 import { QueryParameterProps } from '../../../threads/components/withQueryParameter/WithQueryParameter'
-import { ThreadsAreaContext } from '../../../threads/global/ThreadsArea'
 import { ThreadsListFilter } from '../../../threads/list/ThreadsListFilter'
+import { GQL.ThreadType } from '../../../threads/util'
 
-interface Props extends QueryParameterProps, Pick<ThreadsAreaContext, 'type'> {
+interface Props extends QueryParameterProps {
+    kind: GQL.ThreadType
+
     location: H.Location
 }
 
 const QUERY_FIELDS_IN_USE = ['involves', 'author', 'mentions']
 
 /**
- * The header for the list of check threads.
+ * The header for the list of codemod threads.
  */
-export const CheckThreadsListHeader: React.FunctionComponent<Props> = ({ type, query, onQueryChange, location }) => (
+export const CodemodThreadsListHeader: React.FunctionComponent<Props> = ({ kind, query, onQueryChange, location }) => (
     <div className="d-flex justify-content-between align-items-start">
         <div className="flex-1 mr-5">
             <ListHeaderQueryLinksButtonGroup

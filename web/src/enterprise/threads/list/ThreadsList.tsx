@@ -7,7 +7,8 @@ import { isErrorLike } from '../../../../../shared/src/util/errors'
 import { ListHeaderQueryLinksNav } from '../components/ListHeaderQueryLinks'
 import { QueryParameterProps } from '../components/withQueryParameter/WithQueryParameter'
 import { WithThreadsQueryResults } from '../components/withThreadsQueryResults/WithThreadsQueryResults'
-import { nounForThreadKind, ThreadKind } from '../util'
+import { ThreadsAreaContext } from '../global/ThreadsArea'
+import { threadNoun } from '../util'
 import { ThreadsListItem } from './ThreadsListItem'
 
 export interface ThreadsListContext {
@@ -17,9 +18,7 @@ export interface ThreadsListContext {
     itemCheckboxes?: boolean
 }
 
-interface Props extends QueryParameterProps, ThreadsListContext {
-    kind: ThreadKind
-
+interface Props extends QueryParameterProps, ThreadsListContext, Pick<ThreadsAreaContext, 'type'> {
     /**
      * A React fragment to render on the right side of the list header.
      */
@@ -35,7 +34,7 @@ const LOADING: 'loading' = 'loading'
  * The list of threads with a header.
  */
 export const ThreadsList: React.FunctionComponent<Props> = ({
-    kind,
+    type,
     rightHeaderFragment,
     itemCheckboxes,
     query,
@@ -66,14 +65,14 @@ export const ThreadsList: React.FunctionComponent<Props> = ({
                                         {
                                             label: 'open',
                                             queryField: 'is',
-                                            queryValues: [kind.toLowerCase(), 'open'],
+                                            queryValues: [type.toLowerCase(), 'open'],
                                             count: threadsOrError.totalCount,
                                             icon: AlertOutlineIcon,
                                         },
                                         {
                                             label: 'closed',
                                             queryField: 'is',
-                                            queryValues: [kind.toLowerCase(), 'closed'],
+                                            queryValues: [type.toLowerCase(), 'closed'],
                                             count: 0,
                                             icon: CheckIcon,
                                         },
@@ -89,7 +88,7 @@ export const ThreadsList: React.FunctionComponent<Props> = ({
                         {threadsOrError === LOADING ? (
                             <LoadingSpinner className="m-3" />
                         ) : threadsOrError.nodes.length === 0 ? (
-                            <p className="p-2 mb-0 text-muted">No {nounForThreadKind(kind, true)} found.</p>
+                            <p className="p-2 mb-0 text-muted">No {threadNoun(type, true)} found.</p>
                         ) : (
                             <ul className="list-group list-group-flush">
                                 {threadsOrError.nodes.map((thread, i) => (

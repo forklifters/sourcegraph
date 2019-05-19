@@ -1,12 +1,11 @@
 import H from 'history'
 import React from 'react'
 import { QueryParameterProps } from '../../../threads/components/withQueryParameter/WithQueryParameter'
+import { ThreadsAreaContext } from '../../../threads/global/ThreadsArea'
 import { ThreadsList } from '../../../threads/list/ThreadsList'
-import { ThreadKind } from '../../../threads/util'
 import { CheckThreadsListHeader } from './CheckThreadsListHeader'
 
-interface Props extends QueryParameterProps {
-    kind: ThreadKind
+interface Props extends QueryParameterProps, Pick<ThreadsAreaContext, 'type'> {
     history: H.History
     location: H.Location
 }

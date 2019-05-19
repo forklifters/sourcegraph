@@ -28,7 +28,7 @@ export const ChecksOverviewPage: React.FunctionComponent<Props> = props => (
             </Link>
         </div>
         <WithQueryParameter
-            defaultQuery={threadsQueryWithValues('', { is: [props.kind, 'open'] })}
+            defaultQuery={threadsQueryWithValues('', { is: [props.type, 'open'] })}
             history={props.history}
             location={props.location}
         >

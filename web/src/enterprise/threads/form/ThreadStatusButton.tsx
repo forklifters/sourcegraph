@@ -6,9 +6,10 @@ import { NotificationType } from '../../../../../shared/src/api/client/services/
 import { ExtensionsControllerProps } from '../../../../../shared/src/extensions/controller'
 import * as GQL from '../../../../../shared/src/graphql/schema'
 import { updateThread } from '../../../discussions/backend'
+import { threadNoun } from '../util'
 
 interface Props {
-    thread: Pick<GQL.IDiscussionThread, 'id' | 'status'>
+    thread: Pick<GQL.IDiscussionThread, 'id' | 'status' | 'type'>
     onThreadUpdate: (thread: GQL.IDiscussionThread) => void
     className?: string
     extensionsController: {
@@ -44,7 +45,9 @@ export const ThreadStatusButton: React.FunctionComponent<Props> = ({
             e.preventDefault()
             setIsLoading(true)
             try {
-                const updatedThread = await updateThread({ threadID: thread.id, archive: isOpen })
+                // Include `active: false` so that reopening a check doesn't immediately restart all
+                // of its actions (which is probably undesirable).
+                const updatedThread = await updateThread({ threadID: thread.id, archive: isOpen, active: false })
                 onThreadUpdate(updatedThread)
             } catch (err) {
                 extensionsController.services.notifications.showMessages.next({
@@ -61,7 +64,7 @@ export const ThreadStatusButton: React.FunctionComponent<Props> = ({
     return (
         <button type="submit" disabled={isLoading} className={`btn btn-secondary ${className}`} onClick={onClick}>
             {isLoading ? <LoadingSpinner className="icon-inline" /> : <Icon className="icon-inline" />}{' '}
-            {isOpen ? 'Close' : 'Reopen'} thread
+            {isOpen ? 'Close' : 'Reopen'} {threadNoun(thread.type)}
         </button>
     )
 }
