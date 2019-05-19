@@ -1,14 +1,15 @@
 import { LoadingSpinner } from '@sourcegraph/react-loading-spinner'
 import H from 'history'
 import React, { useMemo, useState } from 'react'
-import { of } from 'rxjs'
-import { map } from 'rxjs/operators'
+import { of, throwError } from 'rxjs'
+import { first, map } from 'rxjs/operators'
 import { WithStickyTop } from '../../../../../../shared/src/components/withStickyTop/WithStickyTop'
 import { ExtensionsControllerProps } from '../../../../../../shared/src/extensions/controller'
 import { gql } from '../../../../../../shared/src/graphql/graphql'
 import * as GQL from '../../../../../../shared/src/graphql/schema'
 import { asError, createAggregateError, ErrorLike, isErrorLike } from '../../../../../../shared/src/util/errors'
 import { queryGraphQL } from '../../../../backend/graphql'
+import { search } from '../../../../search/backend'
 import { QueryParameterProps } from '../../components/withQueryParameter/WithQueryParameter'
 import { ThreadSettings } from '../../settings'
 import { TextDocumentLocationSourceItem, ThreadSourceItem } from './TextDocumentLocationSourceItem'
@@ -116,6 +117,48 @@ const DATA: ThreadSourceItem[] = [
     },
 ]
 
+const queryMatches = (
+    query: string,
+    { extensionsController }: ExtensionsControllerProps
+): Promise<GQL.IDiscussionThreadTargetConnection> =>
+    search(query, { extensionsController })
+        .pipe(
+            map(r => {
+                if (isErrorLike(r)) {
+                    throw new Error(r.message)
+                }
+                // tslint:disable-next-line: no-object-literal-type-assertion
+                return {
+                    __typename: 'DiscussionThreadTargetConnection',
+                    nodes: r.results
+                        .filter((r): r is GQL.IFileMatch => r.__typename === 'FileMatch')
+                        .map(
+                            (r: GQL.IFileMatch) =>
+                                // tslint:disable-next-line: no-object-literal-type-assertion
+                                ({
+                                    __typename: 'DiscussionThreadTargetRepo',
+                                    path: r.file.path,
+                                    revision: { __typename: 'GitRef', name: r.file.commit.oid.slice(0, 6) },
+                                    repository: r.repository,
+                                    url: r.file.url,
+                                    selection: {
+                                        startLine: r.lineMatches[0].lineNumber,
+                                        endLine: r.lineMatches[0].lineNumber,
+                                        startCharacter: r.lineMatches[0].offsetAndLengths[0][0],
+                                        endCharacter:
+                                            r.lineMatches[0].offsetAndLengths[0][0] +
+                                            r.lineMatches[0].offsetAndLengths[0][1],
+                                    },
+                                } as Partial<GQL.IDiscussionThreadTargetRepo>)
+                        ),
+                    totalCount: r.resultCount,
+                    pageInfo: { __typename: 'PageInfo', hasNextPage: r.limitHit },
+                } as GQL.IDiscussionThreadTargetConnection
+            }),
+            first()
+        )
+        .toPromise()
+
 // TODO!(sqs): use relative path/rev for DiscussionThreadTargetRepo
 const querySourceItems = (threadID: GQL.ID): Promise<GQL.IDiscussionThreadTargetConnection> =>
     queryGraphQL(
@@ -178,7 +221,7 @@ const querySourceItems = (threadID: GQL.ID): Promise<GQL.IDiscussionThreadTarget
         .toPromise()
 
 interface Props extends ExtensionsControllerProps, QueryParameterProps {
-    thread: Pick<GQL.IDiscussionThread, 'id' | 'title'>
+    thread: Pick<GQL.IDiscussionThread, 'id' | 'title' | 'type'>
     threadSettings: ThreadSettings
 
     history: H.History
@@ -193,6 +236,7 @@ const LOADING: 'loading' = 'loading'
  */
 export const ThreadSourceItemsList: React.FunctionComponent<Props> = ({
     thread,
+    threadSettings,
     query,
     onQueryChange,
     history,
@@ -207,7 +251,11 @@ export const ThreadSourceItemsList: React.FunctionComponent<Props> = ({
     // tslint:disable-next-line: no-floating-promises
     useMemo(async () => {
         try {
-            setItemsOrError(await querySourceItems(thread.id))
+            setItemsOrError(
+                thread.type === GQL.ThreadType.CHECK
+                    ? await queryMatches(threadSettings.query || '', { extensionsController })
+                    : await querySourceItems(thread.id)
+            )
         } catch (err) {
             setItemsOrError(asError(err))
         }
@@ -246,7 +294,7 @@ export const ThreadSourceItemsList: React.FunctionComponent<Props> = ({
                                 <li key={i}>
                                     <TextDocumentLocationSourceItem
                                         key={i}
-                                        item={{ ...DATA[i], ...item }}
+                                        item={{ ...DATA[i % DATA.length], ...item }}
                                         className="my-3"
                                         isLightTheme={isLightTheme}
                                         history={history}

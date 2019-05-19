@@ -1,6 +1,7 @@
 import AlphabeticalIcon from 'mdi-react/AlphabeticalIcon'
 import { Subscription, Unsubscribable } from 'rxjs'
 import { ExtensionsControllerProps } from '../../../../../../shared/src/extensions/controller'
+import { CHECK_TYPES } from '../sampleCheckTypes'
 
 const PROVIDER_ID = 'check.textMatch'
 
@@ -27,19 +28,8 @@ export function registerTextMatchCheckProviderContributions({
             }
         )
     )
-    subscriptions.add(
-        extensionsController.services.checkProviders.registerProvider(
-            {},
-            {
-                id: 'check.textMatch',
-                title: 'Text find/replace',
-                description: 'Find a string (and optionally replace it with another string)',
-                icon: AlphabeticalIcon,
-                settings: {
-                    providers: PROVIDER_ID,
-                },
-            }
-        )
-    )
+    for (const t of CHECK_TYPES) {
+        subscriptions.add(extensionsController.services.checkTemplates.registerProvider({}, t))
+    }
     return subscriptions
 }

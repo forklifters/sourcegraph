@@ -1,5 +1,5 @@
 export interface ThreadSettings {
-    query: string
+    query?: string
     createPullRequests?: boolean
     pullRequestTemplate?: {
         title?: string

@@ -56,6 +56,9 @@ export const CHECK_TYPES: CheckTemplate[] = [
         description: 'Fix common problems in React code & migrate deprecated React code',
         icon: ReactIcon,
         iconColor: '#00d8ff',
+        settings: {
+            query: "file:\\.[tj]sx$ (key=\")|(defaultValue=)|PropTypes|\\w+=\\{[`'][^$'`]*[`']\\} timeout:10s",
+        },
     },
     {
         id: 'check.removeDSStore',

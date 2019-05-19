@@ -105,7 +105,7 @@ export const TextDocumentLocationSourceItem: React.FunctionComponent<Props> = ({
                               ]
                             : []
                     }
-                    className="p-1"
+                    className="p-1 overflow-auto"
                     isLightTheme={isLightTheme}
                     fetchHighlightedFileLines={fetchHighlightedFileLines}
                 />
